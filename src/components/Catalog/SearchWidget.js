@@ -1,6 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { setQuickSearch, setSearch, setSearchDisplay, setSearchField } from './Slices/catalogSearchSlice';
-import { setActiveCategory } from './Slices/catalogCategoriesSlice';
+import { setQuickSearch, setSearchDisplay, } from '../../store/slices/catalogSearchSlice';
 import { useNavigate } from 'react-router-dom';
 
 function SearchWidget() {
@@ -9,31 +8,25 @@ function SearchWidget() {
   const navigate = useNavigate();
 
   const handleChange = evt => {
-		const { name, value } = evt.target;
-		dispatch(setQuickSearch(value));
-	}
+    const { name, value } = evt.target;
+    dispatch(setQuickSearch(value));
+  }
 
-	const handleSubmit = evt => {
-		evt.preventDefault();
-    if(display === false) {
+  const handleSubmit = evt => {
+    evt.preventDefault();
+    if (display === false) {
       dispatch(setQuickSearch(''));
       dispatch(setSearchDisplay(true));
     }
     else {
-      if(quickSearch) {
-        //поля поиска в каталоге и экспресс-поиска условно независимые
-        dispatch(setSearch(quickSearch));
-        dispatch(setSearchField(quickSearch)); 
+      if (quickSearch) {
         dispatch(setQuickSearch(''));
-        dispatch(setActiveCategory(0));
-
-        //перенаправляем на каталог
-        navigate("/catalog.html");
+        navigate("/catalog.html?search=" + quickSearch);
       }
 
       dispatch(setSearchDisplay(false));
     }
-	}
+  }
 
   return (
     <>

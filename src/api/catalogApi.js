@@ -1,8 +1,8 @@
-import { setHitsStatus, setHits } from '../components/Catalog/Slices/catalogHitsSlice';
-import { setCategories, setCategoryStatus } from '../components/Catalog/Slices/catalogCategoriesSlice';
-import { appendItems, setItemsOffset, setNoMoreItems, setItemsStatus } from '../components/Catalog/Slices/catalogItemsSlice';
-import { setItem, setItemStatus } from '../components/Catalog/Slices/catalogItemSlice';
-import { loadCartItems, setCartStatus, cleanCartState } from '../components/Catalog/Slices/catalogCartSlice';
+import { setHitsStatus, setHits } from '../store/slices/catalogHitsSlice';
+import { setCategories, setCategoryStatus } from '../store/slices/catalogCategoriesSlice';
+import { appendItems, setItemsOffset, setNoMoreItems, setItemsStatus } from '../store/slices/catalogItemsSlice';
+import { setItem, setItemStatus } from '../store/slices/catalogItemSlice';
+import { setCartStatus, cleanCart } from '../store/slices/catalogCartSlice';
 
 const loadHits = () => (dispatch, getState) => {
     dispatch(setHitsStatus("pending"));
@@ -79,51 +79,6 @@ const loadItem = (id) => (dispatch, getState) => {
         });
 }
 
-
-const addToCart = (item) => (dispatch, getState) => {
-    //продаем по тем ценам, что были раньше, но сколько заказал, пока была акция
-    const itemCartId = item.id + item.size + item.price;
-    const storedItems = localStorage.cartItems ? JSON.parse(localStorage.cartItems) : {};
-
-    if (storedItems[itemCartId]) {
-        storedItems[itemCartId].quantity = storedItems[itemCartId].quantity + item.quantity;
-    }
-    else {
-        storedItems[itemCartId] = {
-            id: item.id,
-            title: item.title,
-            size: item.size,
-            price: item.price,
-            quantity: item.quantity
-        }
-    }
-
-    //хранить цену в открытом виде в localStorage - это хорошая попытка разорить магазин:)
-    //но таковы условия задачи
-    localStorage.setItem('cartItems', JSON.stringify(storedItems));
-    dispatch(loadCartItems());
-    dispatch(setCartStatus('idle'));
-}
-
-const removeFromCart = (id) => (dispatch, getState) => {
-    console.log("removing id=", id);
-    let storedItems = localStorage.cartItems ? JSON.parse(localStorage.cartItems) : {};
-
-    if (storedItems[id]) {
-        delete storedItems[id];
-    }
-
-    localStorage.setItem('cartItems', JSON.stringify(storedItems));
-
-    dispatch(loadCartItems());
-}
-
-const cleanCart = () => (dispatch, getState) => {
-    localStorage.setItem('cartItems', JSON.stringify({}));
-    dispatch(cleanCartState());
-    dispatch(loadCartItems());
-}
-
 const sendOrder = () => (dispatch, getState) => {
     console.log("sending order ...");
     dispatch(setCartStatus("pending"));
@@ -154,6 +109,7 @@ const sendOrder = () => (dispatch, getState) => {
         })
     })
         .then(() => {
+            console.log("отправляем заказ");
             dispatch(cleanCart());
             dispatch(setCartStatus("success"));
         })
@@ -162,4 +118,4 @@ const sendOrder = () => (dispatch, getState) => {
         });
 }
 
-export { loadHits, loadCategories, loadItems, loadItem, addToCart, removeFromCart, sendOrder }; 
+export { loadHits, loadCategories, loadItems, loadItem, sendOrder }; 

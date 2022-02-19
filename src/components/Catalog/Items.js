@@ -2,32 +2,18 @@ import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import { loadItems } from '../../api/catalogApi';
 import { Link, useLocation } from "react-router-dom";
-import { cleanItems } from './Slices/catalogItemsSlice';
-import { setSearch } from './Slices/catalogSearchSlice';
-
+import { cleanItems } from '../../store/slices/catalogItemsSlice';
 
 function Items() {
   const { status, noMoreItems, items } = useSelector(state => state.catalogItems);
-
-  const category = useSelector(state => state.catalogCategories.active);
-  const {search} = useSelector(state => state.catalogSearch);
   const dispatch = useDispatch();
-
   let location = useLocation();
 
-  //при первом обращении загружаем список услуг через API
-
-  useEffect(() => { 
-
-    //на главной странице надо сбросить фильтр 
-    if(location.pathname === "/" && search) {
-      dispatch(setSearch(''));
-      return;
-    }
-
-    dispatch(cleanItems()); 
-    dispatch(loadItems()); 
-  }, [category, search]);
+  useEffect(() => {
+    //обновляем товары, если сменился url 
+    dispatch(cleanItems());
+    dispatch(loadItems());
+  }, [location]);
 
   return (
     <>
@@ -54,7 +40,7 @@ function Items() {
         </div>
       }
       {
-        status === "success" && !items.length && 
+        status === "success" && !items.length &&
         <p>К сожалению, такой обуви у нас нет!</p>
       }
       {

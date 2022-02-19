@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from "react-router-dom";
-import { changeCartField } from './Slices/catalogCartSlice';
-import { removeFromCart, sendOrder } from '../../api/catalogApi';
+import { changeCartField, removeCartItem } from '../../store/slices/catalogCartSlice';
+import { sendOrder } from '../../api/catalogApi';
 
 function Cart() {
   const { status, items, phone, address, accepted } = useSelector(state => state.catalogCart);
@@ -54,7 +54,7 @@ function Cart() {
                       <td>{item.quantity}</td>
                       <td>{item.price}</td>
                       <td>{item.price * item.quantity}</td>
-                      <td><button className="btn btn-outline-danger btn-sm" onClick={() => { dispatch(removeFromCart(key)) }}>Удалить</button></td>
+                      <td><button className="btn btn-outline-danger btn-sm" onClick={() => { dispatch(removeCartItem(key)) }}>Удалить</button></td>
                     </tr>
                   )
                 })

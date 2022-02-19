@@ -1,14 +1,36 @@
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
+import {
+  Link,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
 import { loadCategories } from '../../api/catalogApi';
-import { setActiveCategory } from './Slices/catalogCategoriesSlice';
+import { setActiveCategory } from '../../store/slices/catalogCategoriesSlice';
+import { setSearch, setSearchField } from '../../store/slices/catalogSearchSlice';
 
 function Categories() {
   const { status, active, categories } = useSelector(state => state.catalogCategories);
   const dispatch = useDispatch();
+  let [searchParams] = useSearchParams();
+  let location = useLocation();
 
   //при первом обращении загружаем список услуг через API
-  useEffect(() => { dispatch(loadCategories()); }, []);
+  useEffect(() => {
+    dispatch(loadCategories());
+  }, []);
+
+
+  useEffect(() => {
+    let category = searchParams.get("category");
+    dispatch(setActiveCategory(category ? category : 0));
+
+    let search = searchParams.get("search");
+    if (!search) {
+      dispatch(setSearchField(""));
+      dispatch(setSearch(""));
+    }
+  }, [searchParams]);
 
   return (
     <>
@@ -31,10 +53,12 @@ function Categories() {
           {
             categories.map(o => (
               <li className="nav-item" key={o.id}>
-                <a
-                  className={o.id === active ? "nav-link active" : "nav-link"}
-                  onClick={(evt) => { evt.preventDefault(); dispatch(setActiveCategory(o.id)); }} href="#"
-                >{o.title}</a>
+                <Link
+                  className={active == o.id ? "nav-link active" : "nav-link"}
+                  to={`${location.pathname}?category=${o.id}`}
+                >
+                  {o.title}
+                </Link>
               </li>
             ))
           }

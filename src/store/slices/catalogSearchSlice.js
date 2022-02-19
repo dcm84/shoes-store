@@ -5,7 +5,6 @@ const initialState = {
     display: false,
     search: '',
     searchField: ''
-
 };
 
 export const catalogSearchSlice = createSlice({

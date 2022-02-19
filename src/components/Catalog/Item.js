@@ -1,8 +1,10 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from "react-router-dom";
-import { setLessItem, setMoreItem, setItemSelectedSize, cleanItemState } from './Slices/catalogItemSlice';
+import { setLessItem, setMoreItem, setItemSelectedSize, cleanItemState } from '../../store/slices/catalogItemSlice';
 import { useEffect } from 'react';
-import { loadItem, addToCart } from '../../api/catalogApi';
+import { loadItem } from '../../api/catalogApi';
+import { addCartItems, setCartStatus } from '../../store/slices/catalogCartSlice';
+
 import Page404 from '../StaticPages/Page404';
 
 function Item() {
@@ -22,13 +24,14 @@ function Item() {
 
   const handleSubmit = evt => {
     evt.preventDefault();
-    dispatch(addToCart({
+    dispatch(addCartItems({
       id: itemId,
       title: item.title,
       size: selectedSize,
       price: item.price,
       quantity: quantity
     }));
+    dispatch(setCartStatus("idle"));
 
     navigate("/cart.html");
   }

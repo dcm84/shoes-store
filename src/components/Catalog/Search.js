@@ -1,9 +1,26 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { setSearch, setSearchField } from './Slices/catalogSearchSlice';
+import { useEffect } from 'react'
+import { setSearch, setSearchField } from '../../store/slices/catalogSearchSlice';
+import {
+  useSearchParams,
+  useNavigate
+} from "react-router-dom";
+
 
 function Search() {
   const { searchField } = useSelector(state => state.catalogSearch);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  let [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    let search = searchParams.get("search");
+    if (search) {
+      dispatch(setSearchField(search));
+      dispatch(setSearch(search));
+    }
+  }, [searchParams]);
 
   const handleChange = evt => {
     const { name, value } = evt.target;
@@ -12,7 +29,20 @@ function Search() {
 
   const handleSubmit = evt => {
     evt.preventDefault();
-    dispatch(setSearch(searchField));
+
+    if (searchField === "") {
+      searchParams.delete("search");
+      navigate('/catalog.html');
+      return;
+    }
+
+    let search = searchParams.get("search");
+    if (!search) {
+      searchParams.append("search", searchField);
+    }
+    else searchParams.set("search", searchField);
+
+    navigate('/catalog.html?' + searchParams.toString());
   }
 
   return (
